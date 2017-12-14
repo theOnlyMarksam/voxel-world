@@ -6,7 +6,7 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = 'HelloWorld'
+mainClassName = 'main.Game'
 
 sourceCompatibility = 1.8
 
@@ -31,7 +31,10 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'org.apache.logging.log4j:log4j-api:2.9.1'
+    compile 'org.apache.logging.log4j:log4j-core:2.9.1'
 
+    compile "org.joml:joml:${jomlVersion}"
     compile "org.lwjgl:lwjgl:$lwjglVersion"
     compile "org.lwjgl:lwjgl-assimp:$lwjglVersion"
     compile "org.lwjgl:lwjgl-bgfx:$lwjglVersion"
@@ -43,6 +46,7 @@ dependencies {
     compile "org.lwjgl:lwjgl-par:$lwjglVersion"
     compile "org.lwjgl:lwjgl-stb:$lwjglVersion"
     compile "org.lwjgl:lwjgl-vulkan:$lwjglVersion"
+
     runtime "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
     runtime "org.lwjgl:lwjgl-assimp:$lwjglVersion:$lwjglNatives"
     runtime "org.lwjgl:lwjgl-bgfx:$lwjglVersion:$lwjglNatives"
@@ -53,5 +57,25 @@ dependencies {
     runtime "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
     runtime "org.lwjgl:lwjgl-par:$lwjglVersion:$lwjglNatives"
     runtime "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
-    compile "org.joml:joml:${jomlVersion}"
+}
+
+jar {
+    doFirst {
+        manifest {
+            if (!configurations.runtime.isEmpty()) {
+                attributes('Class-Path':
+                        configurations.runtime.collect{it.toURI().toString()}.join(' '))
+            }
+        }
+    }
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Quickstart',
+                'Implementation-Version': version,
+                'Main-Class': mainClassName
+    }
+}
+
+task getDeps(type: Copy) {
+    from sourceSets.main.runtimeClasspath
+    into 'runtime/'
 }
