@@ -16,7 +16,7 @@ public class Player {
         this.position = position;
 
         float aspect = (float) Game.WIDTH / (float)Game.HEIGHT;
-        this.camera = new PerspectiveCamera(position, lookAt, 0.1f, 500f, (float)Math.PI/3, aspect);
+        this.camera = new PerspectiveCamera(position, lookAt, 0.1f, 500f, (float)Math.PI/3f, aspect);
 
         forwardVector = new Vector3f(lookAt.x, 0.0f, lookAt.z).normalize();
 

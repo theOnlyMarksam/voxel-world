@@ -1,9 +1,13 @@
 package entity;
 
+import files.TextureUtil;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import java.net.URL;
+import java.nio.ByteBuffer;
+
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glGetAttribLocation;
@@ -13,14 +17,14 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class Cube {
     private static final float[] cube = {
-            -0.5f, -0.5f,  0.5f,
-             0.5f, -0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f,  0.5f, -0.5f,
-            -0.5f,  0.5f, -0.5f
+            -0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+             0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+            -0.5f,  0.5f, -0.5f, 0.0f, 1.0f,
     };
 
     private static final int[] indices = {
@@ -40,6 +44,7 @@ public class Cube {
 
     private int vao;
     private Vector3f position;
+    private int textureHandle;
 
     public Cube(Vector3f position, int program) {
         this.position = position;
@@ -51,13 +56,30 @@ public class Cube {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, cube, GL_STATIC_DRAW);
 
-        int vertexPosition = glGetAttribLocation(program, "position");
-        glVertexAttribPointer(vertexPosition, 3, GL_FLOAT, false, 0, 0);
-        glEnableVertexAttribArray(vertexPosition);
+        int loc = glGetAttribLocation(program, "position");
+        glVertexAttribPointer(loc, 3, GL_FLOAT, false, 5*4, 0);
+        glEnableVertexAttribArray(loc);
+
+        loc = glGetAttribLocation(program, "uv");
+        glVertexAttribPointer(loc, 2, GL_FLOAT, false, 5*4, 3*4);
+        glEnableVertexAttribArray(loc);
 
         int indicesVbo = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesVbo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+
+        int[] x = new int[1];
+        int[] y = new int[1];
+
+        URL imageName = getClass().getClassLoader().getResource("textures/blocks/dirt.png");
+        ByteBuffer image = TextureUtil.loadPngImage(imageName, x, y, 3);
+
+        textureHandle = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, textureHandle);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x[0], y[0], 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
@@ -73,5 +95,9 @@ public class Cube {
 
     public int getSize() {
         return indices.length;
+    }
+
+    public int getTextureHandle() {
+        return textureHandle;
     }
 }

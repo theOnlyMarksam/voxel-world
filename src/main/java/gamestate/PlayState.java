@@ -61,10 +61,10 @@ public class PlayState implements GameState {
         }
 
         if (glfwGetKey(window, GLFW_KEY_SPACE) == 1) {
-            player.moveUp(dt * speed);
+            player.moveUp(dt * 2 * speed);
         }
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == 1) {
-            player.moveUp(-dt * speed);
+            player.moveUp(-dt * 2 * speed);
         }
 
         player.getCamera().update();

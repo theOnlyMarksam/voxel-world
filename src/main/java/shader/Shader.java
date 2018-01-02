@@ -15,16 +15,14 @@ import static org.lwjgl.opengl.GL11.*;
 public class Shader {
     private static final Logger log = LogManager.getLogger(Shader.class);
 
-    int program;
-    private int vertexShader;
-    private int fragmentShader;
+    private int program;
 
     private FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
     private FloatBuffer vecBuffer = BufferUtils.createFloatBuffer(3);
 
     public Shader(String shaderName) {
-        vertexShader = compileShader(shaderName, GL_VERTEX_SHADER);
-        fragmentShader = compileShader(shaderName, GL_FRAGMENT_SHADER);
+        int vertexShader = compileShader(shaderName, GL_VERTEX_SHADER);
+        int fragmentShader = compileShader(shaderName, GL_FRAGMENT_SHADER);
 
         program = glCreateProgram();
         glAttachShader(program, vertexShader);
@@ -39,7 +37,7 @@ public class Shader {
         log.debug("New " + shaderName + " shader program created.");
     }
 
-    public void uniform3v(String name, Vector3f vector) {
+    public void uniform3fv(String name, Vector3f vector) {
         int loc = getUniformLocation(name);
 
         vector.get(vecBuffer);
