@@ -6,7 +6,7 @@ import org.joml.Vector3f;
 public class Player {
 
     private Vector3f position;
-    private Vector3f lookAt = new Vector3f(0.0f, 0.0f, -1.0f);
+    private Vector3f lookAt = new Vector3f(0.0f, 0.0f, 1.0f);
     private Vector3f forwardVector;
     private Vector3f leftVector = new Vector3f();
     private Vector3f upVector = new Vector3f(0.0f, 1.0f, 0.0f);
@@ -59,5 +59,9 @@ public class Player {
 
     public PerspectiveCamera getCamera() {
         return camera;
+    }
+
+    public Vector3f getPosition() {
+        return position;
     }
 }

@@ -1,10 +1,10 @@
 #version 450 core
 
-uniform sampler2D tex;
+uniform sampler2DArray tex;
 
-in vec2 interpolatedUv;
+in vec3 interpolatedUv;
 
 void main() {
-    vec3 color = texture2D(tex, interpolatedUv).rgb;
+    vec3 color = texture(tex, interpolatedUv).rgb;
     gl_FragColor = vec4(color, 1.0);
 }

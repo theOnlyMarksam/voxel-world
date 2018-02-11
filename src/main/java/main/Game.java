@@ -80,7 +80,7 @@ public class Game {
 
 
         glViewport(0, 0, WIDTH, HEIGHT);
-        glfwSwapInterval(1);
+        glfwSwapInterval(0);
         glfwShowWindow(window);
     }
 

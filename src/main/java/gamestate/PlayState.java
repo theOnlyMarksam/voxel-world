@@ -1,8 +1,8 @@
 package gamestate;
 
-import entity.Cube;
 import entity.Player;
 import main.Game;
+import model.ObservableWorld;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import renderengine.Renderer;
@@ -14,9 +14,10 @@ public class PlayState implements GameState {
     private static float speed = 5f;
 
     private Shader shader;
-    private Cube cube;
     private Renderer renderer;
     private Player player;
+    private ObservableWorld observableWorld;
+    private Vector3f lastPlayerPosition;
 
     private Vector2f rotation = new Vector2f(0.0f, 0.0f);
     private long window;
@@ -25,10 +26,11 @@ public class PlayState implements GameState {
         this.window = window;
         glfwSetKeyCallback(window, this::readInput);
 
-        shader = new Shader("default");
-        cube = new Cube(new Vector3f(0.0f, 0.0f, -5f), shader.getProgram());
-        player = new Player(new Vector3f(0.0f, 0.0f, 0f));
-        renderer = new Renderer(shader, cube, player);
+        this.shader = new Shader("default");
+        this.player = new Player(new Vector3f(0.0f, 0.0f, 0.0f));
+        this.lastPlayerPosition = new Vector3f(player.getPosition());
+        this.observableWorld = new ObservableWorld(shader, player);
+        this.renderer = new Renderer(shader, player, observableWorld);
     }
 
     @Override
@@ -46,6 +48,7 @@ public class PlayState implements GameState {
 
         player.rotateView(rotation.x, rotation.y);
 
+        lastPlayerPosition = lastPlayerPosition.set(player.getPosition());
         if (glfwGetKey(window, GLFW_KEY_W) == 1) {
             player.moveForward(dt * speed);
         }
@@ -67,9 +70,28 @@ public class PlayState implements GameState {
             player.moveUp(-dt * 2 * speed);
         }
 
+        updateObservableWorld();
+
         player.getCamera().update();
 
         rotation.set(0.0f);
+    }
+
+    private void updateObservableWorld() {
+        int lastChunkX = (int) Math.floor(lastPlayerPosition.x / 16);
+        int lastChunkZ = (int) Math.floor(lastPlayerPosition.z / 16);
+
+        int currentChunkX = (int) Math.floor(player.getPosition().x / 16);
+        int currentChunkZ = (int) Math.floor(player.getPosition().z / 16);
+
+        if (currentChunkX - lastChunkX != 0 || currentChunkZ - lastChunkZ != 0) {
+            observableWorld.onPlayerChunkChange(
+                    currentChunkX
+                    , currentChunkZ
+                    , currentChunkX - lastChunkX
+                    , currentChunkZ - lastChunkZ
+            );
+        }
     }
 
     @Override
