@@ -27,7 +27,7 @@ public class PlayState implements GameState {
         glfwSetKeyCallback(window, this::readInput);
 
         this.shader = new Shader("default");
-        this.player = new Player(new Vector3f(0.0f, 0.0f, 0.0f));
+        this.player = new Player(new Vector3f(0.0f, 25.0f, 0.0f));
         this.lastPlayerPosition = new Vector3f(player.getPosition());
         this.observableWorld = new ObservableWorld(shader, player);
         this.renderer = new Renderer(shader, player, observableWorld);

@@ -15,7 +15,7 @@ public class ChunkMap {
     private int chunkOffsetX;
     private int chunkOffsetZ;
 
-    public ChunkMap(int worldSize, Player player) {
+    public ChunkMap(int worldSize, Player player, Chunk[] initChunks) {
         this.worldSize = worldSize;
         this.worldSideLength = 2*worldSize + 1;
         this.player = player;
@@ -23,6 +23,10 @@ public class ChunkMap {
         this.chunks = new Chunk[numOfChunks];
         this.chunkOffsetX = (int) Math.floor(player.getPosition().x / 16);
         this.chunkOffsetZ = (int) Math.floor(player.getPosition().z / 16);
+
+        for (Chunk chunk : initChunks) {
+            put(chunk);
+        }
     }
 
     public Chunk[] getChunks() {
@@ -42,11 +46,11 @@ public class ChunkMap {
     }
 
     public Chunk get(int x, int z) {
-        if (Math.abs(x) > worldSize || Math.abs(z) > worldSize) {
+        if (Math.abs(x - chunkOffsetX) > worldSize || Math.abs(z - chunkOffsetZ) > worldSize) {
             return null;
         }
 
-        int index = numOfChunks / 2 - worldSideLength * z - x;
+        int index = numOfChunks / 2 - worldSideLength * (z - chunkOffsetZ) - (x - chunkOffsetX);
         return chunks[index];
     }
 
@@ -93,9 +97,9 @@ public class ChunkMap {
         }
 
         if (dZ == 1) {
-            System.arraycopy(chunks, 0, chunks, worldSize, chunks.length - worldSize);
+            System.arraycopy(chunks, 0, chunks, worldSideLength, chunks.length - worldSideLength);
         } else if (dZ == -1) {
-            System.arraycopy(chunks, worldSize, chunks, 0, chunks.length - worldSize);
+            System.arraycopy(chunks, worldSideLength, chunks, 0, chunks.length - worldSideLength);
         } else {
             log.error("dZ=" + dZ);
             throw new IllegalArgumentException("Absolute value of dZ cannot be bigger than 1");

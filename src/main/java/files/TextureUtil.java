@@ -18,6 +18,8 @@ public class TextureUtil {
             throw new RuntimeException("Desired channels not correct");
         }
 
+        log.info("Loading image: " + texture.toString());
+
         BufferedImage image;
 
         try {
@@ -44,6 +46,7 @@ public class TextureUtil {
         }
 
         buffer.flip();
+        log.info("Image with parameters w=" + x[0] + ", h=" + y[0] + " loaded successfully");
         return buffer;
     }
 }

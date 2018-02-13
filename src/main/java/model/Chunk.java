@@ -1,12 +1,18 @@
 package model;
 
+import model.mesh.Mesh;
+import model.texture.TextureMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import shader.Shader;
+
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class Chunk {
     private static final Logger log = LogManager.getLogger(Chunk.class);
 
     private Block[] blocks = new Block[16 * 16 * 256];
+    private Mesh mesh = null;
     private int chunkX;
     private int chunkZ;
 
@@ -17,6 +23,15 @@ public class Chunk {
         for (int i = 0; i < blocks.length; i++) {
             blocks[i] = Block.AIR;
         }
+    }
+
+    public void createMesh(ChunkMap map, TextureMap textureMap, Shader shader) {
+        mesh = new Mesh(map, textureMap, this, shader);
+        mesh.generateMesh();
+    }
+
+    public Mesh getMesh() {
+        return mesh;
     }
 
     public void setBlock(int x, int y, int z, Block blockType) {
