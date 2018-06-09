@@ -16,13 +16,19 @@ public class ChunkMap {
     private int chunkOffsetZ;
 
     public ChunkMap(int worldSize, Player player, Chunk[] initChunks) {
-        this.worldSize = worldSize;
-        this.worldSideLength = 2*worldSize + 1;
+        this.worldSize = worldSize+1; // make the world one unit bigger than requested
+        this.worldSideLength = 2*this.worldSize + 1;
         this.player = player;
         this.numOfChunks = worldSideLength * worldSideLength;
         this.chunks = new Chunk[numOfChunks];
         this.chunkOffsetX = (int) Math.floor(player.getPosition().x / 16);
         this.chunkOffsetZ = (int) Math.floor(player.getPosition().z / 16);
+
+        if (initChunks.length != numOfChunks) {
+            log.error("Initial chunk array size was " + initChunks.length
+                    + ", but needed to be " + numOfChunks);
+            throw new IllegalArgumentException("Illegal number of initial chunks.");
+        }
 
         for (Chunk chunk : initChunks) {
             put(chunk);
@@ -30,7 +36,16 @@ public class ChunkMap {
     }
 
     public Chunk[] getChunks() {
-        return chunks;
+        Chunk[] renderChunks = new Chunk[(2*(worldSize - 1) + 1)*(2*(worldSize - 1) + 1)];
+        int chunkCount = 0;
+
+        for (int x = 1; x < worldSideLength-1; x++) {
+            for (int y = 1; y < worldSideLength-1; y++) {
+                renderChunks[chunkCount++] = chunks[x * worldSideLength + y];
+            }
+        }
+
+        return renderChunks;
     }
 
     public void put(Chunk chunk) {
@@ -66,6 +81,19 @@ public class ChunkMap {
             chunkOffsetZ += dZ;
             return shiftBoth(dX, dZ);
         }
+    }
+
+    public Block getBlockAtWorldCoords(int worldX, int worldY, int worldZ) {
+        int chunkX = Math.floorDiv(worldX, 16);
+        int chunkZ = Math.floorDiv(worldZ, 16);
+
+        Chunk c = get(chunkX, chunkZ);
+
+        if (c == null) {
+            return null;
+        }
+
+        return c.getBlock(worldX - 16*chunkX, worldY, worldZ - 16*chunkZ);
     }
 
     private int[] shiftX(int dX) {

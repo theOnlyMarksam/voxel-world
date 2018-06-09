@@ -12,13 +12,14 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 public class ObservableWorld {
     private static final Logger log = LogManager.getLogger(ObservableWorld.class);
 
-    private int radius = 5;
+    private int radius = 1;
     private ChunkMap observableChunks;
     private TextureMap textureMap;
     private Player player;
     private Shader shader;
     private int playerChunkX;
     private int playerChunkZ;
+    private boolean canBreakBlock = true;
 
     public ObservableWorld(Shader shader, Player player) {
         this.shader = shader;
@@ -41,12 +42,12 @@ public class ObservableWorld {
     }
 
     private Chunk[] initChunks() {
-        int numOfChunks = (2*radius + 1)*(2*radius + 1);
+        int numOfChunks = (2*(radius+1) + 1)*(2*(radius+1) + 1);
         int chunkCount = 0;
         Chunk[] chunks = new Chunk[numOfChunks];
 
-        for (int x = -radius; x <= radius; x++) {
-            for (int z = -radius; z <= radius; z++) {
+        for (int x = -radius-1; x <= radius+1; x++) {
+            for (int z = -radius-1; z <= radius+1; z++) {
                 chunks[chunkCount] = generateChunk(x + playerChunkX, z + playerChunkZ);
                 chunkCount++;
             }
@@ -93,9 +94,20 @@ public class ObservableWorld {
             observableChunks.put(generateChunk(requiredChunks[i], requiredChunks[i + 1]));
         }
 
-        for (int i = 0; i < requiredChunks.length; i += 2) {
-            observableChunks.get(requiredChunks[i], requiredChunks[i + 1])
+        for (int i = 2; i < requiredChunks.length-2; i += 2) {
+            observableChunks.get(requiredChunks[i]-dX, requiredChunks[i + 1]-dZ)
                     .createMesh(observableChunks, textureMap, shader);
         }
+    }
+
+    public void onLmbPress() {
+        if (canBreakBlock) {
+            canBreakBlock = false;
+            // TODO finish
+        }
+    }
+
+    public void onLmbRelease() {
+        canBreakBlock = true;
     }
 }

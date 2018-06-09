@@ -145,7 +145,6 @@ public class Mesh {
         vertexList.clear();
 
         // generate mesh only for one chunk
-        // Add top faces to the mesh
         for (int y = 255; y >= 0; y--) {
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++) {

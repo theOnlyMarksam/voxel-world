@@ -25,6 +25,7 @@ public class PlayState implements GameState {
     public PlayState(long window) {
         this.window = window;
         glfwSetKeyCallback(window, this::readInput);
+        glfwSetMouseButtonCallback(window, this::mouseInput);
 
         this.shader = new Shader("default");
         this.player = new Player(new Vector3f(0.0f, 25.0f, 0.0f));
@@ -49,24 +50,24 @@ public class PlayState implements GameState {
         player.rotateView(rotation.x, rotation.y);
 
         lastPlayerPosition = lastPlayerPosition.set(player.getPosition());
-        if (glfwGetKey(window, GLFW_KEY_W) == 1) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
             player.moveForward(dt * speed);
         }
-        if (glfwGetKey(window, GLFW_KEY_S) == 1) {
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
             player.moveForward(-dt * speed);
         }
 
-        if (glfwGetKey(window, GLFW_KEY_A) == 1) {
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
             player.moveLeft(-dt * speed);
         }
-        if (glfwGetKey(window, GLFW_KEY_D) == 1) {
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
             player.moveLeft(dt * speed);
         }
 
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == 1) {
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
             player.moveUp(dt * 2 * speed);
         }
-        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == 1) {
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             player.moveUp(-dt * 2 * speed);
         }
 
@@ -100,7 +101,18 @@ public class PlayState implements GameState {
     }
 
     private void readInput(long window, int key, int scanCode, int action, int mods) {
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
             glfwSetWindowShouldClose(window, true);
+        }
+    }
+
+    private void mouseInput(long window, int button, int action, int mods) {
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+            observableWorld.onLmbPress();
+        }
+
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+            observableWorld.onLmbRelease();
+        }
     }
 }
